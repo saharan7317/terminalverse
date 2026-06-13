@@ -1,0 +1,487 @@
+/* TerminalVerse — Global Styles & Theme System */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500;600;700&family=Press+Start+2P&display=swap');
+@import "tailwindcss";
+
+/* ─── CSS Custom Properties (Theme Tokens) ─────────────────────────────── */
+
+:root {
+  --tv-bg: #0a0a0f;
+  --tv-fg: #c0c0c0;
+  --tv-primary: #00ff41;
+  --tv-secondary: #ff00ff;
+  --tv-accent: #00ffff;
+  --tv-error: #ff0040;
+  --tv-warning: #ffaa00;
+  --tv-success: #00ff41;
+  --tv-dim: #4a4a5a;
+  --tv-border: #1a1a2e;
+  --tv-font: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+
+  --tv-glow-primary: 0 0 10px rgba(0, 255, 65, 0.3), 0 0 20px rgba(0, 255, 65, 0.1);
+  --tv-glow-accent: 0 0 10px rgba(0, 255, 255, 0.3), 0 0 20px rgba(0, 255, 255, 0.1);
+  --tv-glow-secondary: 0 0 10px rgba(255, 0, 255, 0.3), 0 0 20px rgba(255, 0, 255, 0.1);
+}
+
+/* ─── Base Reset ─────────────────────────────────────────────────────────── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--tv-font);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--tv-fg);
+  background-color: var(--tv-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Terminal Container ─────────────────────────────────────────────────── */
+
+.terminal-container {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background: var(--tv-bg);
+}
+
+.terminal-screen {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.terminal-bottom-spacer {
+  height: 40vh;
+}
+
+/* ─── Scanline Overlay ───────────────────────────────────────────────────── */
+
+.scanline-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.08) 2px,
+    rgba(0, 0, 0, 0.08) 4px
+  );
+}
+
+.scanlines .scanline-overlay {
+  display: block;
+}
+
+/* ─── CRT Flicker ────────────────────────────────────────────────────────── */
+
+.crt-flicker {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9;
+  animation: crtFlicker 0.15s infinite;
+  opacity: 0;
+}
+
+.flicker-enabled .crt-flicker {
+  display: block;
+}
+
+@keyframes crtFlicker {
+  0% { opacity: 0; }
+  5% { opacity: 0.015; }
+  10% { opacity: 0; }
+  15% { opacity: 0.02; }
+  20% { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* ─── Glow Effects ───────────────────────────────────────────────────────── */
+
+.glow-enabled .prompt-user,
+.glow-enabled .prompt-host {
+  text-shadow: var(--tv-glow-primary);
+}
+
+.glow-enabled .prompt-path {
+  text-shadow: var(--tv-glow-accent);
+}
+
+.glow-enabled .terminal-input {
+  text-shadow: 0 0 8px rgba(0, 255, 65, 0.2);
+}
+
+/* ─── Boot Sequence ──────────────────────────────────────────────────────── */
+
+.boot-sequence {
+  min-height: 100vh;
+  cursor: pointer;
+}
+
+.boot-lines {
+  padding: 0;
+}
+
+.boot-line pre {
+  font-family: var(--tv-font);
+  font-size: 14px;
+  line-height: 1.4;
+  margin: 0;
+  white-space: pre;
+}
+
+.boot-skip-hint {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  color: var(--tv-dim);
+  font-size: 12px;
+  opacity: 0.6;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(2px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Terminal Input ─────────────────────────────────────────────────────── */
+
+.terminal-input-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0;
+  position: relative;
+}
+
+.terminal-prompt {
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-family: var(--tv-font);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.prompt-user {
+  color: var(--tv-primary);
+  font-weight: 600;
+}
+
+.prompt-at {
+  color: var(--tv-dim);
+}
+
+.prompt-host {
+  color: var(--tv-primary);
+  font-weight: 600;
+}
+
+.prompt-separator {
+  color: var(--tv-dim);
+}
+
+.prompt-path {
+  color: var(--tv-accent);
+  font-weight: 600;
+}
+
+.prompt-dollar {
+  color: var(--tv-fg);
+}
+
+/* Hidden input captures keystrokes but is invisible */
+.terminal-input-hidden {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  padding: 0;
+  margin: 0;
+  border: none;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Visible text display — cursor follows right after typed text */
+.input-display {
+  display: inline;
+  cursor: text;
+  font-family: var(--tv-font);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.input-text-visible {
+  color: var(--tv-fg);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* ─── Cursor ─────────────────────────────────────────────────────────────── */
+
+.cursor-blink {
+  display: inline-block;
+  width: 8.4px;
+  height: 1.2em;
+  background: var(--tv-primary);
+  animation: blink 1.06s step-end infinite;
+  vertical-align: text-bottom;
+  margin-left: 0;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ─── Tab Completions ────────────────────────────────────────────────────── */
+
+.tab-completions {
+  width: 100%;
+  padding: 4px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 2px;
+  padding-left: calc(1ch * 22); /* align with input start */
+}
+
+.tab-completion-item {
+  color: var(--tv-dim);
+  font-size: 13px;
+}
+
+.tab-completion-item.active {
+  color: var(--tv-accent);
+  font-weight: 600;
+}
+
+/* ─── Terminal Output ────────────────────────────────────────────────────── */
+
+.terminal-line {
+  margin: 0;
+}
+
+.terminal-input-display {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  line-height: 1.5;
+}
+
+.input-text {
+  color: var(--tv-fg);
+  font-family: var(--tv-font);
+  font-size: 14px;
+}
+
+.terminal-output-block {
+  margin: 0;
+}
+
+.output-line {
+  margin: 0;
+}
+
+.output-line pre,
+.output-pre {
+  font-family: var(--tv-font);
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.output-error pre {
+  color: var(--tv-error);
+}
+
+.output-break {
+  height: 8px;
+}
+
+/* ─── Links ──────────────────────────────────────────────────────────────── */
+
+.terminal-screen a {
+  color: var(--tv-accent);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.terminal-screen a:hover {
+  color: var(--tv-secondary);
+  text-shadow: var(--tv-glow-secondary);
+  text-decoration-style: solid;
+}
+
+/* ─── Snake Game ─────────────────────────────────────────────────────────── */
+
+.snake-game {
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  align-items: flex-start;
+  padding-top: 20px;
+}
+
+.game-render {
+  font-family: var(--tv-font);
+  font-size: 14px;
+  line-height: 1.3;
+  margin: 0;
+  white-space: pre;
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────────────────── */
+
+.terminal-screen::-webkit-scrollbar {
+  width: 6px;
+}
+
+.terminal-screen::-webkit-scrollbar-track {
+  background: var(--tv-bg);
+}
+
+.terminal-screen::-webkit-scrollbar-thumb {
+  background: var(--tv-border);
+  border-radius: 3px;
+}
+
+.terminal-screen::-webkit-scrollbar-thumb:hover {
+  background: var(--tv-dim);
+}
+
+/* ─── Vintage Theme Overrides ────────────────────────────────────────────── */
+
+[data-theme="vintage"] .boot-line pre,
+[data-theme="vintage"] .terminal-input,
+[data-theme="vintage"] .output-line pre,
+[data-theme="vintage"] .output-pre,
+[data-theme="vintage"] .terminal-prompt,
+[data-theme="vintage"] .input-text,
+[data-theme="vintage"] .game-render {
+  font-family: "Press Start 2P", monospace;
+  font-size: 11px;
+  line-height: 1.8;
+}
+
+[data-theme="vintage"] .cursor-blink {
+  width: 10px;
+  height: 14px;
+  background: var(--tv-primary);
+}
+
+[data-theme="vintage"] .terminal-container {
+  image-rendering: pixelated;
+}
+
+/* ─── Reduced Motion ─────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor-blink {
+    animation: none;
+    opacity: 1;
+  }
+
+  .crt-flicker {
+    display: none !important;
+  }
+
+  .boot-skip-hint {
+    animation: none;
+    opacity: 0.6;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 1; }
+    to { opacity: 1; }
+  }
+}
+
+/* ─── Mobile Responsive ──────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .terminal-screen {
+    padding: 12px 10px;
+  }
+
+  body {
+    font-size: 12px;
+  }
+
+  .boot-line pre,
+  .terminal-input,
+  .output-line pre,
+  .output-pre,
+  .terminal-prompt,
+  .input-text {
+    font-size: 12px;
+  }
+
+  .cursor-blink {
+    width: 7px;
+    height: 16px;
+  }
+
+  .tab-completions {
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 11px;
+  }
+
+  .boot-line pre,
+  .terminal-input,
+  .output-line pre,
+  .output-pre {
+    font-size: 11px;
+  }
+}
+
+/* ─── Selection ──────────────────────────────────────────────────────────── */
+
+::selection {
+  background: rgba(0, 255, 255, 0.15);
+  color: var(--tv-accent);
+}
